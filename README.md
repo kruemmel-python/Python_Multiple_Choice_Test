@@ -15,6 +15,6 @@ Dieses Projekt ist ein Multiple-Choice-Quiz-Programm, das mit Python und der Tki
 Um das Programm zu verwenden, klonen Sie das Repository und führen Sie `Python_Multiple_Choice_Test.py` mit Python aus.
 
 ```bash
-git clone https://github.com/kruemmel-python/Python_Multiple_Choice_Test
+git clone [https://github.com/kruemmel-python/Python_Multiple_Choice_Test](https://github.com/kruemmel-python/Python_Multiple_Choice_Test.git)
 cd [Ihr Repository-Name]
 python Python_Multiple_Choice_Test.py
