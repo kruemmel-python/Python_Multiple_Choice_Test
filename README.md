@@ -1,5 +1,6 @@
 # Python_Multiple_Choice_Test
-# Python Multiple Choice Test
+![image](https://github.com/kruemmel-python/Python_Multiple_Choice_Test/assets/169469747/3efe2a2d-d917-4d5f-81fc-4dd823a6ab2d)
+
 
 ## Beschreibung
 Dieses Projekt ist ein Multiple-Choice-Quiz-Programm, das mit Python und der Tkinter-Bibliothek erstellt wurde. Es ermöglicht Benutzern, Quizfragen zu beantworten und ihren Fortschritt zu speichern und zu laden. Das Programm stellt Fragen aus einer SQLite-Datenbank und bietet eine grafische Benutzeroberfläche für eine benutzerfreundliche Interaktion.
