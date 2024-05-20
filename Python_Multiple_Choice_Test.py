@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import messagebox
 import os
 import json
+import random
 
 # Pfad zur Speicherdatei
 speicherdatei_pfad = 'quiz_fortschritt.json'
@@ -19,6 +20,18 @@ punkte = 0
 aktuelle_frage_id = 1
 gesamtpunkte = 0
 gesamtwiederholungen = 0  # Gesamtanzahl der Wiederholungen
+
+
+
+# Funktion, um eine zufällige Frage-ID zu erhalten
+def zufaellige_frage_id_erhalten():
+    cursor.execute('SELECT id FROM fragen')
+    fragen_ids = [id[0] for id in cursor.fetchall()]
+    random.shuffle(fragen_ids)  # Mische die Liste der Frage-IDs
+    return fragen_ids
+
+# Globale Variable für die Liste der zufälligen Frage-IDs
+zufaellige_fragen_ids = zufaellige_frage_id_erhalten()
 
 # Funktion, um den Fortschritt zu speichern
 def fortschritt_speichern(fortschritt):
@@ -68,8 +81,18 @@ def gesamtpunkte_berechnen():
     gesamtpunkte = cursor.fetchone()[0]
 
 # Funktion, um die nächste Frage zu laden und anzuzeigen
-def naechste_frage():
+def naechste_frage(wiederholen=False):
     global aktuelle_frage_id, gesamtwiederholungen
+    if wiederholen:
+        # Wenn die Frage wiederholt werden soll, behalten wir die aktuelle_frage_id bei
+        pass
+    elif zufaellige_fragen_ids:
+        # Wenn nicht wiederholt wird, wählen wir eine neue zufällige Frage aus
+        aktuelle_frage_id = zufaellige_fragen_ids.pop()
+    else:
+        messagebox.showinfo("Ende des Tests", f"Der Test ist beendet. Sie haben {punkte} von {gesamtpunkte} Punkten erreicht.")
+        root.destroy()
+        return
     cursor.execute('SELECT * FROM fragen WHERE id = ?', (aktuelle_frage_id,))
     frage = cursor.fetchone()
     
@@ -87,17 +110,16 @@ def naechste_frage():
         messagebox.showinfo("Ende des Tests", f"Der Test ist beendet. Sie haben {punkte} von {gesamtpunkte} Punkten erreicht.")
         root.destroy()
 
+
 # Funktion, die aufgerufen wird, wenn die Antwort falsch ist
 def antwort_falsch():
     global gesamtwiederholungen
     wiederholen = messagebox.askyesno("Falsch", "Ihre Antwort ist falsch. Möchten Sie die Frage wiederholen?")
     if wiederholen:
         gesamtwiederholungen += 1  # Gesamtanzahl der Wiederholungen erhöhen
-        naechste_frage()
+        naechste_frage(wiederholen=True)
     else:
-        global aktuelle_frage_id
-        aktuelle_frage_id += 1
-        naechste_frage()
+        naechste_frage(wiederholen=False)
 
 # Funktion, um die ausgewählte Antwort zu überprüfen und ggf. die Frage zu wiederholen
 def antwort_ueberpruefen():
@@ -118,15 +140,19 @@ def antwort_ueberpruefen():
             naechste_frage()
         else:
             antwort_falsch()
-    elif any(var.get() == (i == korrekte_antwort) for i, var in enumerate(check_vars, 1)):
-        punkte += 1
-        messagebox.showinfo("Richtig", "Ihre Antwort ist richtig!")
-        aktuelle_frage_id += 1
-        # Fortschritt speichern
-        fortschritt_speichern({'punkte': punkte, 'aktuelle_frage_id': aktuelle_frage_id, 'gesamtwiederholungen': gesamtwiederholungen})
-        naechste_frage()
     else:
-        antwort_falsch()
+        # Index der korrekten Antwort ermitteln (beginnend bei 0)
+        korrekte_antwort_index = korrekte_antwort - 1
+        # Überprüfen, ob die ausgewählte Antwort korrekt ist
+        if check_vars[korrekte_antwort_index].get() == 1:
+            punkte += 1
+            messagebox.showinfo("Richtig", "Ihre Antwort ist richtig!")
+            aktuelle_frage_id += 1
+            # Fortschritt speichern
+            fortschritt_speichern({'punkte': punkte, 'aktuelle_frage_id': aktuelle_frage_id, 'gesamtwiederholungen': gesamtwiederholungen})
+            naechste_frage()
+        else:
+            antwort_falsch()      
 
 # GUI-Elemente
 frage_label = tk.Label(root, text="", font=('Helvetica', 16))
